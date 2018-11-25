@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <string>
 #define N 300
+#define Measure 1
+#define Operation 0
+#define Decline 2
 using namespace std;
 
 class Qubit {
@@ -13,20 +17,49 @@ class Qubit {
     }
     void setname(char* newname) { strcpy(name, newname); }
     void printque() {
-        for (int i = 0; i < tail; i++) cout << queue[i]<<",";
+        for (int i = 0; i < tail; i++) cout << queue[i] << ",";
         cout << endl;
     }
     int sign = 0;
-
+    bool operator== (const Qubit &a) const{
+        if (strcmp(a.name,name)==0) return true;
+        else return false;
+    }
    private:
-    char name[10] = {};
+
+     char name[10] = {};
     int queue[100] = {};
     int tail = 0;
 };
 
-Qubit qubits[N];
+class Instruction {
+   public:
+    int line = 0;
+    char prefix[20];
+    char code[100];
+    bool is_operation = false;
+    bool is_void=false;
+    void setprefix(char* operation) { strcpy(prefix, operation); }
+    Qubit qubits[10];
+    int qubitsnum = 0;  //比特数量
+    void insertQubit(Qubit q) {
+        qubits[qubitsnum] = q;
+        qubitsnum++;
+    }
+    void print() {
+        cout << line << ": " << code << endl<<"qubits: ";
+        for (int i = 0; i < qubitsnum; i++) {
+            cout << qubits[i].getname() << " ";
+        }
+        cout << endl << endl;
+    }
+    void printcode(){
+        if (is_void) return;
+        cout<<code;
+    }
+};
 
-int hashi(char* name) {
+int hashi(Qubit* qubits, char* name) {
     int i, sum;
     for (i = 0, sum = 0; name[i]; i++) {
         if (name[i] == ' ') continue;
@@ -41,11 +74,13 @@ int hashi(char* name) {
     return sum;
 }
 
-char* cutoperation(char* instruction) {
+char* cutoperation(char* instruction, char*& code) {
     int i, j;
     for (i = 0; instruction[i]; i++) {
         if (instruction[i] == ' ') {
-            return instruction + i + 1;
+            code = instruction + i + 1;
+            instruction[i] = 0;
+            return instruction;
         }
     }
     return NULL;
@@ -66,34 +101,53 @@ char* getqubit(char*& code) {
     }
 }
 
-main() {
-    char codes[200][20];
-    int i = 1;
+int judge(char* instruction) {
+    if (strcmp(instruction, "qreg") == 0 || strcmp(instruction, "creg") == 0)
+        return Decline;
+    else if (strcmp(instruction, "measure") == 0)
+        return Measure;
+    else
+        return Operation;
+}
+
+void Lexer(Instruction codes[], Qubit qubitqueue[]) {
+    // char codes[200][20];
+    int j = 1, i;
+    Qubit qubits[N];
     int findqubit[100] = {}, u = 0;
-    while (fgets(codes[i], 100, stdin) != NULL) {
-        cout << codes[i];
-        char* code = cutoperation(codes[i]);
+    while (fgets(codes[j].code, 100, stdin) != NULL) {
+        char instruction[100] = {};
+        strcpy(instruction, codes[j].code);
+        codes[j].code[strlen(codes[j].code)-1]=0;
+        // cout << codes[j].code;
+        codes[j].line = j;
+        i = j;
+        j++;
+        if (instruction[0] == '\n' || instruction[0] == '\0') continue;
+        char* code;
+        char* prefix = cutoperation(instruction, code);
+        if (judge(prefix) != Operation) {  //判断是否为门操作
+            codes[i].is_operation = false;
+            continue;
+        }
+        codes[i].is_operation = true;
         while (1) {
             auto qub = getqubit(code);
             if (qub == NULL) break;
-            int tmp = hashi(qub);
-            //cout << qub << ": " << tmp << endl;
+            int tmp = hashi(qubits, qub);
+            // cout << qub << ": " << tmp << endl;
             if (qubits[tmp].sign == 0) {
                 qubits[tmp].setname(qub);
                 qubits[tmp].sign = 1;
-                findqubit[u] = tmp;
+                findqubit[u] = tmp;  // findqubit数组记录了所有qubit的哈希值，可以找到qubit；
                 u++;
             }
-
             qubits[tmp].insert(i);
+            codes[i].insertQubit(qubits[tmp]);
         }
-        i++;
+    }
+    for (i = 0; i < u; i++) {
+        qubitqueue[i] = qubits[findqubit[i]];
     }
     cout << endl;
-    for (i = 0; i < u; i++) {
-        int tmp = findqubit[i];
-        cout << qubits[tmp].getname() << ": ";
-        qubits[tmp].printque();
-        cout << endl;
-    }
 }
