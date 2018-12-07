@@ -50,6 +50,7 @@ measure a[1]->c[1];     //8
 measure b->c[2];        //9
 ```
 We also test for 5000 times, and the measure result is
+
   | Measure result | Percent(%) |
   | :------------: | :--------: |
   | 00             | 46.93%     |
