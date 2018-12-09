@@ -30,7 +30,7 @@ cx q[0],q[2];
 
 ## Experiment
 We run our testing OpenQASM code one real quantum backend, the [IBM Q 5 Tenerife [ibmqx4]](https://github.com/Qiskit/ibmq-device-information/tree/master/backends/tenerife/V1) provided by IBMQ<br>
-To eliminate the time factors, we test the original code and translated code alternately ten groups for each code. Each group contains 1000 times running.<br>
+To eliminate the time factors, we test the original code and translated code alternately. We test ten groups for each code. Each group contains 1000 times running.<br>
 Let's think about this quantum program in OpenQASM
 ```c
 include "qelib1.inc";
