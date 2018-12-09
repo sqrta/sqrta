@@ -5,7 +5,7 @@ When there is an operation __A__ like:<br>
 
 	Op q1,q2,...,qn
 
-Op is a kind of quantum operation such as **Hadamard** operation or **CNOT** operation, and q1,q2...qn are qubits. If this instruction is where some of qubits in q1,q2...qn first appear in the code,such as qi, we can postpone this instruction and change qi into **Superposition** later. We put those first appeared qubits q1,q2,...,qn in a Set called **Q**.We define __B__ is a quantum instruction executed later than __A__ (maybe several instructions later) and it is the first time one of qubits in **Q** appear again after __A__, then we can move __A__ just before __B__. Then we can also put those first appeared qubits in __B__ into **Q** and regard __A__ and __B__ as a single instruction and do this translation again until there is no available translation.
+Op is a kind of quantum operation such as **Hadamard** operation or **CNOT** operation, and q1,q2...qn are qubits. If this instruction is where some of qubits in q1,q2...qn first appear in the code,such as qi, we can postpone this instruction and change qi into **Superposition** later. We put those first appeared qubits q1,q2,...,qn in a Set called **Q**.We define __B__ is a quantum instruction executed later than __A__ (maybe several instructions later) and it is the first time one of qubits in **Q** appear again after __A__, then we can move __A__ just before __B__. Then we can also put those first appeared qubits in __B__ into **Q** and regard __A__ and __B__ as a single unit and do this translation again until there is no available translation.
 
 ## Example
 Let's think about the OpenQASM program below <br>
@@ -25,8 +25,15 @@ tdg q[2];
 h q[0];
 s q[0];
 cx q[0],q[2];
+t q[2];
 ```
-
+Then we can regard the last three lines 
+```c
+h q[0];
+s q[0];
+cx q[0],q[2];
+```
+as a single unit. But there is no available translation now,because there is "t q[2]" at the 12 line just after the unit and q[2] appear in it.
 
 ## Experiment
 We run our testing OpenQASM code one real quantum backend, the [IBM Q 5 Tenerife [ibmqx4]](https://github.com/Qiskit/ibmq-device-information/tree/master/backends/tenerife/V1) provided by IBMQ<br>
