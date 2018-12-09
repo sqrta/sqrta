@@ -1,17 +1,17 @@
 # Experiment_report
 ## The translation rule:
 We suggest that at the begining all of the qubits are |0> state, and because the qubit in |0> state is much more stable than qubit in **Superposition**, we can postpone the operation that change the qubits into **Superposition**.<br>
-When there is an operation _A_ like:<br>
+When there is an operation __A__ like:<br>
 
 	Op q1,q2,...,qn
 
-Op is a kind of quantum operation such as **Hadamard** operation or **CNOT** operation, and q1,q2...qn are qubits. If this instruction is where some of qubits in q1,q2...qn first appear in the code,such as qi, we can postpone this instruction and change qi into **Superposition** later. We put those first appeared qubits q1,q2,...,qn in a Set called **Q**.We define _B_ is a quantum instruction executed later than _A_ (maybe several instructions later) and it is the first time one of qubits in **Q** appear again after _A_, then we can move _A_ just before _B_. Then we can also put those first appeared qubits in _B_ into **Q** and regard _A_ and _B_ as a single instruction and do this translation again until there is no available translation.
+Op is a kind of quantum operation such as **Hadamard** operation or **CNOT** operation, and q1,q2...qn are qubits. If this instruction is where some of qubits in q1,q2...qn first appear in the code,such as qi, we can postpone this instruction and change qi into **Superposition** later. We put those first appeared qubits q1,q2,...,qn in a Set called **Q**.We define __B__ is a quantum instruction executed later than __A__ (maybe several instructions later) and it is the first time one of qubits in **Q** appear again after __A__, then we can move __A__ just before __B__. Then we can also put those first appeared qubits in __B__ into **Q** and regard __A__ and __B__ as a single instruction and do this translation again until there is no available translation.
 
 ## Example
 Let's think about the OpenQASM program below <br>
 The code is part of a 3 qubit grover amplification writed by IBM,you can find it [here](https://github.com/Qiskit/openqasm/blob/master/examples/ibmqx2/011_3_qubit_grover_50_.qasm)
 ![](grover_code.png)
-We can see the progra, apply **Hadamard** operation on qubit 0 in line 3——"h q[0]". We suggest line 3 as the instruction _A_ and put q[0] into Set **Q**. Then we will find that q[0] appears again in line 6 "s q[0]". We regard this instruction as _B_. Then we can move line 3 just before line 6. Then we can regard these two instructions "h q[0]" and "s q[0]" as a _A_ and do this translation again. Then we will find q[0] next appear in
+We can see the progra, apply **Hadamard** operation on qubit 0 in line 3——"h q[0]". We suggest line 3 as the instruction __A__ and put q[0] into Set **Q**. Then we will find that q[0] appears again in line 6 "s q[0]". We regard this instruction as __B__. Then we can move line 3 just before line 6. Then we can regard these two instructions "h q[0]" and "s q[0]" as a __A__ and do this translation again. Then we will find q[0] next appear in
 line 11——"cx q[0],q[2]". Then we can move both two instruction just before line 11. Then the code will become
 ```c
 qreg q[5];
