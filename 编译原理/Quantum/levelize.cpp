@@ -41,9 +41,9 @@ class Level {
         Instruction* p = head;
         while (p->next != NULL) {
             if (p->next == a) break;
+            p=p->next;
         }
         if (p->next == NULL){
-            printf("hahah\n");
             return;
         } 
         if (p->next == tail) tail = p;

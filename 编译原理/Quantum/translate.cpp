@@ -89,9 +89,19 @@ main() {
             set<Qubit*> qubits_set;
             insert_codes_qubit(*p, qubits_set);
             int cur_level = i;
-
+            /*
+            if (tower[i].line==30){
+                cout<<"***************"<<endl;
+                p->printcode();
+                printf("\n##########\n");
+                for (int u=0;u<9;u++){
+                    tower[i+u].print();
+                }
+                cout<<"***************"<<endl;
+            }*/
             while (qubits_set.size() < total_qubits) {
-                // printf("cur: %d, begin: %d\n",cur_level,unit_begin);
+                //if (tower[i].line==30)
+                //printf("cur: %d, begin: %d, size: %d\n",cur_level,unit_begin,qubits_set.size());
                 auto tmp_level =
                     find_next_level(qubits_set, cur_level);  //找到和当前set重合的下一个level
                 if (tmp_level == IFINITY) break;
@@ -105,15 +115,19 @@ main() {
             }
             cur_level = ins_unit[unit_begin - 1]->line;
             unit_begin--;
-            // printf("begin: %d, cur\n",unit_begin);
+            //printf("begin: %d, cur\n",unit_begin);
             for (int u = unit_begin - 1; u >= 0; u--) {
                 auto ins = ins_unit[u];
                 int l = ins->line;
+                if (l==cur_level - unit_begin + u) continue;
                 tower[l].del(ins);
+                /*
+            if (tower[i].line==30){
+                printf("break\n");
+            }                */
                 tower[cur_level - unit_begin + u].insert(ins);
-                // printf("insert: %d\n",cur_level - unit_begin + u);
-                // tower[cur_level - unit_begin + u].print();
             }
+
             //return 0;
         }
     }

@@ -55,11 +55,9 @@ class Instruction {
         qubitsnum++;
     }
     void print() {
-        cout <<  code << endl << "qubits: ";
-        for (int i = 0; i < qubitsnum; i++) {
-            cout << qubits[i]->getname() << " ";
-        }
-        cout << endl << endl;
+        printf("%d: ",line);
+        printcode();
+        cout<<endl;
     }
     void printcode() {
         if (is_void) return;
@@ -131,6 +129,7 @@ void Lexer(Instruction codes[], Qubit qubits[]) {
     //Qubit qubits[N];
     int findqubit[100] = {}, u = 0;
     while (fgets(codes[j].code, 100, stdin) != NULL) {
+        if (strcmp(codes[j].code,"end\n")==0) break;
         char instruction[100] = {};
         strcpy(instruction, codes[j].code);
         if (instruction[0] == '\n' || instruction[0] == '\0') continue;
