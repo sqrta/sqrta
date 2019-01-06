@@ -81,6 +81,6 @@ int levelize(Level tower[], Instruction codes[], Qubit qubits[]) {
             newline++;
         }
     }
-    for (i=1;i<newline;i++) tower[i].print();
+    
     return newline - 1;
 }

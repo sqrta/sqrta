@@ -34,8 +34,7 @@ class Qubit {
     bool operator<(const Qubit& a) const { return strcmp(name, a.name) < 0; }
 
     char name[10] = {};
-    Instruction* queue[100] = {};
-    
+    Instruction* queue[100] = {};  //该比特出现在哪些instruction中的指针
 };
 
 class Instruction {
@@ -47,7 +46,7 @@ class Instruction {
     bool is_void = false;
     int mark = 0;  // can do every thing you want, is not used in class
     void setprefix(char* operation) { strcpy(prefix, operation); }
-    Qubit *qubits[10];
+    Qubit* qubits[10];
     int qubitsnum = 0;  //比特数量
     Qubit* get_qubit(int i) { return qubits[i]; }
     void insertQubit(Qubit* q) {
@@ -55,22 +54,33 @@ class Instruction {
         qubitsnum++;
     }
     void print() {
-        printf("%d: ",line);
+        printf("%d: ", line);
         printcode();
-        cout<<endl;
+        cout << endl;
     }
     void printcode() {
         if (is_void) return;
         cout << code;
     }
-    Instruction* next=NULL;
+    bool judge_qubits() {  //判断是否所有比特的mark位都不为1，是则返回true
+        for (int i = 0; i < qubitsnum; i++) {
+            if (qubits[i]->mark == 0) return false;
+        }
+        return true;
+    }
+
+    void set_qubits(int state) {  //将所有qubit的信息置为state
+        for (int i = 0; i < qubitsnum; i++) {
+            qubits[i]->mark = state;
+        }
+    }
+    Instruction* next = NULL;
 };
 
 int hashi(Qubit* qubits, char* name) {
     int i, sum;
-    for (i=0;qubits[i].sign;i++){
-        if (strcmp(name,qubits[i].name)==0)
-            return i;
+    for (i = 0; qubits[i].sign; i++) {
+        if (strcmp(name, qubits[i].name) == 0) return i;
     }
     return i;
     /*
@@ -85,6 +95,14 @@ int hashi(Qubit* qubits, char* name) {
         sum++;
     }
     return sum;*/
+}
+
+void print_qubit(Qubit a) {
+    cout << a.name << ": ";
+    for (int i = 0; i < a.tail; i++) {
+        printf("%d ", a.queue[i]->line);
+    }
+    cout << endl;
 }
 
 char* cutoperation(char* instruction, char*& code) {
@@ -123,13 +141,13 @@ int judge(char* instruction) {
         return Operation;
 }
 
-void Lexer(Instruction codes[], Qubit qubits[]) {
+void Lexer(Instruction codes[], Qubit qubits[], int& total_qubit, int& total_instruction) {
     // char codes[200][20];
     int j = 1, i;
-    //Qubit qubits[N];
+    // Qubit qubits[N];
     int findqubit[100] = {}, u = 0;
     while (fgets(codes[j].code, 100, stdin) != NULL) {
-        if (strcmp(codes[j].code,"end\n")==0) break;
+        if (strcmp(codes[j].code, "end\n") == 0) break;
         char instruction[100] = {};
         strcpy(instruction, codes[j].code);
         if (instruction[0] == '\n' || instruction[0] == '\0') continue;
@@ -138,7 +156,6 @@ void Lexer(Instruction codes[], Qubit qubits[]) {
         codes[j].line = j;
         i = j;
         j++;
-        
 
         char* code;
         char* prefix = cutoperation(instruction, code);
@@ -155,13 +172,15 @@ void Lexer(Instruction codes[], Qubit qubits[]) {
             if (qubits[tmp].sign == 0) {
                 qubits[tmp].setname(qub);
                 qubits[tmp].sign = 1;
-                //findqubit[u] = tmp;  // findqubit数组记录了所有qubit的哈希值，可以找到qubit；
+                // findqubit[u] = tmp;  // findqubit数组记录了所有qubit的哈希值，可以找到qubit；
                 u++;
             }
             qubits[tmp].insert(&codes[i]);
             codes[i].insertQubit(&qubits[tmp]);
         }
     }
+    total_instruction = j - 1;
+    total_qubit = u;
     /*
     for (i = 0; i < u; i++) {
         qubitqueue[i] = qubits[findqubit[i]];
