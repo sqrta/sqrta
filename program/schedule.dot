@@ -1,0 +1,7 @@
+digraph graph1{
+    "c a,b 8" -> "H d 1"
+    "c a,b 8" -> "c a,c 8" [color = "red"]
+    "c a,c 8" -> "c a,b 8" [color = "red"]
+    "c a,c 8" -> "c c,d 8"
+}
+
